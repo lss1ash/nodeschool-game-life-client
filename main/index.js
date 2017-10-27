@@ -25,7 +25,7 @@ let ws = null;
 let game = null;
 
 App.onToken = (token) => {
-	ws = new WebSocket(`ws://ws.rudenko.tech/life/api?token=${token}`);
+	ws = new WebSocket(`ws://localhost:8080/api?token=${token}`);
 	addHandlers(ws);
 };
 

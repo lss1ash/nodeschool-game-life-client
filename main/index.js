@@ -21,32 +21,42 @@
 // Nyan cat lies here...
 //
 
-let ws = null;
 let game = null;
+let socket = null;
 
 App.onToken = (token) => {
-	ws = new WebSocket(`ws://localhost:8080/api?token=${token}`);
-	addHandlers(ws);
+	// ws = new WebSocket(`ws://localhost:8080/api?token=${token}`);
+	socket = io(`http://localhost:8080/?token=${token}`, {
+    path: '/',
+    transports: ['websocket']
+  });
+	addHandlers(socket);
 };
 
-function addHandlers(ws) {
-	ws.onopen = e => {
-		console.log(e, 'open');
-	};
+function addHandlers(socket) {
+	socket.on('connect', () => {
+		console.log('Connection opened');
+	});
 
-	ws.onmessage = e => {
-		const data = JSON.parse(e.data);
-		processResp(data);
-	};
+	socket.on('reconnect', () => {
+		// По-хорошему стоит просто чистить игровое поле
+		console.log('Reconnecting...');
+		window.location.reload(false);
+	});
 
-	ws.onerror = e => {
+	socket.on('message', msg => {
+		const message = JSON.parse(msg);
+		processResp(message);
+	});
+
+	socket.on('error', e => {
 		console.log(`Error occured: ${e}`);
-	};
+	});
 
-	ws.onclose = e => {
+	socket.on('disconnect', e => {
 		const wasClean = e.wasClean;
 		console.log(`closing was clean: ${wasClean}`);
-	};
+	});
 }
 
 function processResp({type, data}) {
@@ -80,5 +90,5 @@ function send(data) {
 		data
 	});
 
-	ws.send(result);
+	socket.send(result);
 }

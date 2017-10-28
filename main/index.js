@@ -25,10 +25,11 @@ let game = null;
 let socket = null;
 
 App.onToken = (token) => {
-	// ws = new WebSocket(`ws://localhost:8080/api?token=${token}`);
-	socket = io(`http://localhost:8080/?token=${token}`, {
+	socket = io(`https://localhost:8000/api?token=${token}`, {
     path: '/',
-    transports: ['websocket']
+    transports: ['websocket'],
+		// rejectUnauthorized: false,
+		secure: true
   });
 	addHandlers(socket);
 };

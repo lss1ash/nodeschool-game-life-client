@@ -2,7 +2,7 @@
 	<div id="root" @load="mounted()">
 		<md-toolbar class="md-whiteframe md-whiteframe-1dp">
 			<h2 class="md-title" style="flex: 1">WebSocket</h2>
-			<h2 class="md-title" style="flex: 2" v-if="userName.length > 0">You are loggged as {{userName}}</h2>
+			<h2 class="md-title" style="flex: 2" v-if="userName.length > 0">You are logged as {{userName}}</h2>
 			<md-button
 				@click="openDialog('Join')"
 				v-if="!userName"
@@ -65,6 +65,9 @@
 				this.userName = '';
 				this.prompt.value = this.userName;
 				localStorage.removeItem('lifeToken');
+				if (socket) {
+					socket.disconnect();
+				}
 				location.reload(false); //
 			},
 			fromLocalStorage() {

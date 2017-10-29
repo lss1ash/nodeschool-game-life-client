@@ -54,9 +54,8 @@ function addHandlers(socket) {
 		console.log(`Error occured: ${e}`);
 	});
 
-	socket.on('disconnect', e => {
-		const wasClean = e.wasClean;
-		console.log(`closing was clean: ${wasClean}`);
+	socket.on('disconnect', msg => {
+		console.log(`Connection closed: ${msg}`);
 	});
 }
 
@@ -95,3 +94,5 @@ function send(data) {
 
 	socket.send(result);
 }
+
+window.App.init();

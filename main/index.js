@@ -25,10 +25,11 @@ let game = null;
 let socket = null;
 
 App.onToken = (token) => {
+	console.log(localStorage.getItem('lifeToken'));
 	socket = io(`https://localhost:8000/api?token=${token}`, {
     path: '/',
     transports: ['websocket'],
-		// rejectUnauthorized: false,
+		rejectUnauthorized: false,
 		secure: true
   });
 	addHandlers(socket);
@@ -39,10 +40,9 @@ function addHandlers(socket) {
 		console.log('Connection opened');
 	});
 
-	socket.on('reconnect', () => {
-		// По-хорошему стоит просто чистить игровое поле
-		console.log('Reconnecting...');
-		window.location.reload(false);
+	socket.on('reconnect', msg => {
+		const message = JSON.parse(msg);
+		processResp(message);
 	});
 
 	socket.on('message', msg => {
@@ -75,10 +75,12 @@ function processResp({type, data}) {
 }
 
 function initGame({state, settings, user}) {
-	game = new LifeGame(user, settings);
-	game.init();
+	if (!game) {
+		game = new LifeGame(user, settings);
+		game.init();
+		game.send = send;
+	}
 	game.setState(state);
-	game.send = send;
 }
 
 function update(data) {

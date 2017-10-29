@@ -1,12 +1,19 @@
 <template>
-	<div id="root">
+	<div id="root" @load="mounted()">
 		<md-toolbar class="md-whiteframe md-whiteframe-1dp">
 			<h2 class="md-title" style="flex: 1">WebSocket</h2>
+			<h2 class="md-title" v-if="userName.length > 0">You are logged as {{userName}}</h2>
 			<md-button
 				@click="openDialog('Join')"
 				v-if="!userName"
 			>
 				Join
+			</md-button>
+			<md-button
+				@click="logout()"
+				v-if="userName.length > 0"
+			>
+				Logout
 			</md-button>
 		</md-toolbar>
 
@@ -26,9 +33,11 @@
 </template>
 
 <script>
+  var name = localStorage.getItem('lifeToken');
+
 	export default {
 		data: () => ({
-			userName: '',
+			userName: name || '',
 			prompt: {
 				title: 'What\'s your name?',
 				ok: 'Done',
@@ -49,7 +58,20 @@
 			},
 			onClose() {
 				this.userName = this.prompt.value;
+				localStorage.setItem('lifeToken', this.userName);
 				this.$emit('set_user_name', this.userName);
+			},
+			logout() {
+				this.userName = '';
+				this.prompt.value = this.userName;
+				localStorage.removeItem('lifeToken');
+				this.$emit('user_logout');
+				location.reload(false); //
+			},
+			fromLocalStorage() {
+				if (this.userName.length > 0) {
+					this.$emit('set_user_name', this.userName);
+				}
 			}
 		}
 	}

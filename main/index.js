@@ -21,32 +21,47 @@
 // Nyan cat lies here...
 //
 
-let ws = null;
 let game = null;
+let socket = null;
 
 App.onToken = (token) => {
-	ws = new WebSocket(`ws://localhost:8080/api?token=${token}`);
-	addHandlers(ws);
+	socket = io(`https://localhost:8000/api?token=${token}`, {
+    path: '/',
+    transports: ['websocket'],
+		rejectUnauthorized: false,
+		secure: true
+  });
+	addHandlers(socket);
 };
 
-function addHandlers(ws) {
-	ws.onopen = e => {
-		console.log(e, 'open');
-	};
+App.onLogout = () => {
+	if (socket) {
+		socket.disconnect();
+	}
+};
 
-	ws.onmessage = e => {
-		const data = JSON.parse(e.data);
-		processResp(data);
-	};
+function addHandlers(socket) {
+	socket.on('connect', () => {
+		console.log('Connection opened');
+	});
 
-	ws.onerror = e => {
+	socket.on('reconnect', msg => {
+		const message = JSON.parse(msg);
+		processResp(message);
+	});
+
+	socket.on('message', msg => {
+		const message = JSON.parse(msg);
+		processResp(message);
+	});
+
+	socket.on('error', e => {
 		console.log(`Error occured: ${e}`);
-	};
+	});
 
-	ws.onclose = e => {
-		const wasClean = e.wasClean;
-		console.log(`closing was clean: ${wasClean}`);
-	};
+	socket.on('disconnect', msg => {
+		console.log(`Connection closed: ${msg}`);
+	});
 }
 
 function processResp({type, data}) {
@@ -64,10 +79,12 @@ function processResp({type, data}) {
 }
 
 function initGame({state, settings, user}) {
-	game = new LifeGame(user, settings);
-	game.init();
+	if (!game) { // Проверка на случай разрыва соединения
+		game = new LifeGame(user, settings);
+		game.init();
+		game.send = send;
+	}
 	game.setState(state);
-	game.send = send;
 }
 
 function update(data) {
@@ -80,5 +97,7 @@ function send(data) {
 		data
 	});
 
-	ws.send(result);
+	socket.send(result);
 }
+
+window.App.init();

@@ -29,7 +29,7 @@ if (env === 'production') {
 appName = appName + '.js';
 
 // Main Settings config
-module.exports = {
+module.exports = [{
 	entry: entryPoint,
 	output: {
 		path: exportPath,
@@ -60,4 +60,14 @@ module.exports = {
 		}
 	},
 	plugins
-};
+}
+// ,
+// {
+// 	entry: './main/index.js',
+// 	output: {
+// 		path: path.resolve(__dirname, '../main'),
+// 		filename: 'index.min.js'
+// 	},
+// 	plugins
+// }
+];

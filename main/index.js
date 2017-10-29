@@ -25,7 +25,6 @@ let game = null;
 let socket = null;
 
 App.onToken = (token) => {
-	console.log(localStorage.getItem('lifeToken'));
 	socket = io(`https://localhost:8000/api?token=${token}`, {
     path: '/',
     transports: ['websocket'],
@@ -33,6 +32,12 @@ App.onToken = (token) => {
 		secure: true
   });
 	addHandlers(socket);
+};
+
+App.onLogout = () => {
+	if (socket) {
+		socket.disconnect();
+	}
 };
 
 function addHandlers(socket) {
@@ -74,7 +79,7 @@ function processResp({type, data}) {
 }
 
 function initGame({state, settings, user}) {
-	if (!game) {
+	if (!game) { // Проверка на случай разрыва соединения
 		game = new LifeGame(user, settings);
 		game.init();
 		game.send = send;

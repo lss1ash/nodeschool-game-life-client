@@ -37,7 +37,7 @@
 
 	export default {
 		data: () => ({
-			userName: name ? name : '',
+			userName: name || '',
 			prompt: {
 				title: 'What\'s your name?',
 				ok: 'Done',
@@ -65,9 +65,7 @@
 				this.userName = '';
 				this.prompt.value = this.userName;
 				localStorage.removeItem('lifeToken');
-				if (socket) {
-					socket.disconnect();
-				}
+				this.$emit('user_logout');
 				location.reload(false); //
 			},
 			fromLocalStorage() {

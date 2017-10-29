@@ -60,14 +60,12 @@ module.exports = [{
 		}
 	},
 	plugins
-}
-// ,
-// {
-// 	entry: './main/index.js',
-// 	output: {
-// 		path: path.resolve(__dirname, '../main'),
-// 		filename: 'index.min.js'
-// 	},
-// 	plugins
-// }
-];
+},
+{
+	entry: './main/index.js',
+	output: {
+		path: path.resolve(__dirname, '../main'),
+		filename: 'index.min.js'
+	},
+	plugins
+}];
